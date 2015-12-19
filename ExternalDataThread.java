@@ -141,7 +141,14 @@ public class ExternalDataThread implements Runnable
 					columnName = "column";
 					if (debug)
 						Logger.printMsg("QueueID: " + queueId + " creating external table");
-					GP.createExternalTable(conn, osServer, refreshTypeAction, sourceTable, targetSchema, targetTable, maxGPId, queueId, jobPort);
+
+                    if (sourceType.equals("netezza")) {
+
+                        Netezza.createExternalTable(conn,sourceSchema,refreshType, sourceTable,targetSchema,targetTable,maxGPId, queueId, sourceServer, sourceDatabase,
+                                sourcePort, sourceUser,sourcePass);
+                    } else {
+                        GP.createExternalTable(conn, osServer, refreshTypeAction, sourceTable, targetSchema, targetTable, maxGPId, queueId, jobPort);
+                    }
 
 					location = 4400;
 					//Truncate the target table if refresh
@@ -227,7 +234,13 @@ public class ExternalDataThread implements Runnable
 						//Create the external table 
 						if (debug)
 							Logger.printMsg("QueueID: " + queueId + " create external table");
-						GP.createExternalTable(conn, osServer, refreshTypeAction, sourceTable, targetSchema, targetTable, maxGPId, queueId, jobPort);
+                        if (sourceType.equals("netezza")) {
+
+                            Netezza.createExternalTable(conn,sourceSchema,refreshType, sourceTable,targetSchema,targetTable,maxGPId, queueId, sourceServer, sourceDatabase,
+                                    sourcePort, sourceUser,sourcePass);
+                        } else {
+                            GP.createExternalTable(conn, osServer, refreshTypeAction, sourceTable, targetSchema, targetTable, maxGPId, queueId, jobPort);
+                        }
 
 						location = 5900;	
 						//Insert into target table, selecting from external table	
@@ -337,7 +350,13 @@ public class ExternalDataThread implements Runnable
 						//Create the external table 
 						if (debug)
 							Logger.printMsg("QueueID: " + queueId + " create external table");
-						GP.createExternalTable(conn, osServer, refreshTypeAction, sourceTable, targetSchema, targetTable, maxGPId, queueId, jobPort);
+                        if (sourceType.equals("netezza")) {
+
+                            Netezza.createExternalTable(conn,sourceSchema,refreshType, sourceTable,targetSchema,targetTable,maxGPId, queueId, sourceServer, sourceDatabase,
+                                    sourcePort, sourceUser,sourcePass);
+                        } else {
+                            GP.createExternalTable(conn, osServer, refreshTypeAction, sourceTable, targetSchema, targetTable, maxGPId, queueId, jobPort);
+                        }
 
 						location = 8100;
 						//Insert into target table, selecting from external table	
