@@ -91,6 +91,8 @@ public class GpfdistRunner
 
 		try
 		{
+            // TODO Commented for Testing for Netezza
+
 			String shellCommand = osHome + "/bin/" + myCommand; 
 			Process p = Runtime.getRuntime().exec(shellCommand);
 			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -104,6 +106,7 @@ public class GpfdistRunner
 				//unable to get a gpfdist process so fail
 				throw new SQLException("ERROR: Unable to acquire a gpfdist process");
 			}
+
 		}
 		catch (Exception ex)
 		{
@@ -118,6 +121,8 @@ public class GpfdistRunner
 
 		try
 		{
+            // TODO Commented for Testing for Netezza
+
 			String shellCommand = osHome + "/bin/" + myCommand; 
 			shellCommand += " " + Integer.toString(port);
 			Process p = Runtime.getRuntime().exec(shellCommand);
@@ -128,6 +133,7 @@ public class GpfdistRunner
 				myReturn += line + " ";
 				//System.out.println(line);
 			}
+
 			return myReturn;
 		}
 		catch (Exception ex)

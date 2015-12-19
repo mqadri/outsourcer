@@ -26,7 +26,7 @@ WHERE rownum = 1 AND NOT deleted;
 ALTER TABLE os.ao_ext_connection
   ADD CONSTRAINT ext_check
   CHECK ( (source_type = 'oracle'::text AND source_database_name IS NOT NULL AND source_instance_name IS NULL) OR
-          (source_type = 'sqlserver' AND source_database_name IS NULL) );
+          (source_type = 'sqlserver' AND source_database_name IS NULL)  OR (source_type = 'netezza'::text AND source_database_name IS NOT NULL)   );
 
 ALTER TABLE os.ao_ext_connection ADD CONSTRAINT ext_check_port
-  CHECK ((source_port > 0 AND source_type = 'oracle'::text) OR (source_type = 'sqlserver'::text AND source_port IS NULL));
+  CHECK ((source_port > 0 AND source_type = 'oracle'::text) OR (source_type = 'sqlserver'::text AND source_port IS NULL)OR (source_port > 0 AND source_type = 'netezza'::text));

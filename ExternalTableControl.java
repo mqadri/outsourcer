@@ -212,6 +212,12 @@ public class ExternalTableControl
 						conn = CommonDB.connectOracle(e.sourceServerName, e.sourceDatabaseName, intSourcePort, e.sourceUserName, e.sourcePass, 10);
 						schemaList = Oracle.getSchemaList(conn);
 					}
+                    else if (e.sourceType.equals("netezza")){
+                        sourceDatabaseName = e.sourceDatabaseName;
+                        int intSourcePort = Integer.parseInt(e.sourcePort);
+                        conn = CommonDB.connectNetezza(e.sourceServerName, e.sourceDatabaseName, intSourcePort, e.sourceUserName, e.sourcePass, 10);
+                        schemaList = Netezza.getSchemaList(conn);
+                    }
 
 					scheduleList = ScheduleModel.getDescriptions();
 					msg = ExternalTableView.viewCreate(databaseList, schemaList, e.id, e.sourceType, e.sourceServerName, e.sourceInstanceName, e.sourcePort, sourceDatabaseName, e.sourceUserName, targetSchema, targetAppendOnly, targetCompressed, targetRowOrientation, refreshType, scheduleList);

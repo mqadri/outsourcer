@@ -239,6 +239,12 @@ public class ExternalTableModel
 				conn = CommonDB.connectOracle(e.sourceServerName, e.sourceDatabaseName, intSourcePort, e.sourceUserName, e.sourcePass, 10);
 				rs = Oracle.getTableList(conn, sourceSchema);
 			}
+            else if (e.sourceType.equals("netezza"))
+            {
+                int intSourcePort = Integer.parseInt(e.sourcePort);
+                conn = CommonDB.connectNetezza(e.sourceServerName, e.sourceDatabaseName, intSourcePort, e.sourceUserName, e.sourcePass, 10);
+                rs = Netezza.getTableList(conn, sourceSchema);
+            }
 
 			while (rs.next())
 			{

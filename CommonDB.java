@@ -83,6 +83,37 @@ public class CommonDB
 				conn.close();
 
 			}
+            else if (sourceType.equals("netezza"))
+            {
+                location = 5000;
+                conn = connectNetezza(sourceServer, sourceDatabase, sourcePort, sourceUser, sourcePass, 10);
+
+                location = 5100;
+                Netezza.checkSourceSchema(conn, sourceDatabase, sourceSchema);
+
+                location = 5200;
+                Netezza.checkSourceTable(conn, sourceDatabase, sourceSchema, sourceTable);
+
+                location = 5300;
+                if (refreshType.equals("append"))
+                {
+                    location = 5400;
+                    Netezza.checkAppendColumnName(conn, sourceDatabase, sourceSchema, sourceTable, columnName);
+                }
+                else if (refreshType.equals("replication"))
+                {
+                   /* location = 5500;
+                    Netezza.checkReplAppendColumnName(conn, sourceDatabase, sourceSchema, sourceTable, columnName);
+
+                    location = 5600;
+                    Netezza.checkReplPrimaryKey(conn, sourceDatabase, sourceSchema, sourceTable);
+                    */
+                    throw new SQLException("(" + myclass + ":" + method + ":" + location + ":" + "Replication Not Supported for Netezza" + ")");
+                }
+
+                location = 5700;
+                conn.close();
+            }
 
 		}
 		catch (SQLException ex)
@@ -336,7 +367,31 @@ public class CommonDB
 				conn.close();
 
 			}
+            else if (sourceType.equals("netezza"))
+            {
+                location = 4000;
+                conn = connectNetezza(sourceServer, sourceDatabase, sourcePort, sourceUser, sourcePass, 10);
 
+                location = 4100;
+                //Get the SQL needed to generate CREATE TABLE
+                strSQL = Netezza.getSQLForCreateTable(conn, sourceSchema, sourceTable);
+
+                location = 4200;
+                //Get the GP DDL based on source DDL
+                output = getGPCreateTableDDL(conn, targetSchema, targetTable, targetAppendOnly, targetCompressed, targetRowOrientation, strSQL);
+
+                location = 4300;
+                //Get the SQL needed to generate the table distribution based on Primary Key of source
+                strSQL = Netezza.getSQLForDistribution(conn, sourceSchema, sourceTable);
+
+                location = 4400;
+                //Get the table distribution based on Primary Key of source
+                output = output + getDistributionDDL(conn, targetSchema, targetTable, strSQL);
+
+                location = 4500;
+                conn.close();
+
+            }
 			//output the DDL for the table to be created in GP
 			location = 5000;
 			return output;
@@ -801,4 +856,48 @@ public class CommonDB
 		}
 
 	}
+
+    public static Connection connectNetezza(String sourceServer, String sourceDatabase, int sourcePort, String sourceUser, String sourcePass, int fetchSize) throws Exception
+    {
+        String method = "connectNetezza";
+        int location = 1000;
+
+        try
+        {
+            location = 2000;
+            Class.forName("org.netezza.Driver");
+
+
+            location = 2200;
+            Properties props = new Properties();
+
+            location = 2210;
+            props.put("user", sourceUser);
+
+            location = 2220;
+            props.put("password", sourcePass);
+
+            location = 2230;
+            String fetchSizeString = Integer.toString(fetchSize);
+
+            location = 2235;
+            props.put("defaultRowPrefetch", fetchSizeString);
+
+            location = 2300;
+            String connectionUrl = "jdbc:netezza://" + sourceServer + ":" + sourcePort + "/" + sourceDatabase;
+
+            location = 2400;
+            Connection conn = DriverManager.getConnection(connectionUrl, props);
+
+            return conn;
+        }
+        catch(ClassNotFoundException e)
+        {
+            throw new SQLException("(" + myclass + ":" + method + ":" + location + ":ClassNotFound! " + e.getMessage() + ")");
+        }
+        catch (SQLException ex)
+        {
+            throw new SQLException("(" + myclass + ":" + method + ":" + location + ":" + ex.getMessage() + ")");
+        }
+    }
 }

@@ -51,20 +51,20 @@ WHERE rownum = 1 AND NOT deleted;
 ALTER TABLE os.ao_job
   ADD CONSTRAINT job_check
   CHECK ((refresh_type = 'refresh'::text AND column_name IS NULL 
-          AND source_type IN ('oracle'::text, 'sqlserver'::text) AND source_server_name IS NOT NULL
+          AND source_type IN ('oracle'::text, 'sqlserver'::text, 'netezza'::text) AND source_server_name IS NOT NULL
           AND source_database_name IS NOT NULL AND source_schema_name IS NOT NULL
           AND source_table_name IS NOT NULL AND source_user_name IS NOT NULL AND source_pass IS NOT NULL
           AND target_schema_name IS NOT NULL AND target_table_name IS NOT NULL
           )  OR
          (refresh_type = 'append'::text AND column_name IS NOT NULL
-          AND source_type IN ('oracle'::text, 'sqlserver'::text) AND source_server_name IS NOT NULL
+          AND source_type IN ('oracle'::text, 'sqlserver'::text, 'netezza'::text) AND source_server_name IS NOT NULL
           AND source_database_name IS NOT NULL AND source_schema_name IS NOT NULL
           AND source_table_name IS NOT NULL AND source_user_name IS NOT NULL AND source_pass IS NOT NULL
           AND target_schema_name IS NOT NULL AND target_table_name IS NOT NULL
           )
          OR
          (refresh_type = 'replication'::text AND column_name IS NOT NULL
-          AND source_type IN ('oracle'::text, 'sqlserver'::text) AND source_server_name IS NOT NULL
+          AND source_type IN ('oracle'::text, 'sqlserver'::text, 'netezza'::text) AND source_server_name IS NOT NULL
           AND source_database_name IS NOT NULL AND source_schema_name IS NOT NULL
           AND source_table_name IS NOT NULL AND source_user_name IS NOT NULL AND source_pass IS NOT NULL
           AND target_schema_name IS NOT NULL AND target_table_name IS NOT NULL
@@ -76,7 +76,7 @@ ALTER TABLE os.ao_job
           AND target_schema_name IS NULL AND target_table_name IS NULL
           ) OR
          (refresh_type = 'ddl'::text AND column_name IS NULL AND sql_text IS NULL
-          AND source_type IN ('oracle'::text, 'sqlserver'::text) AND source_server_name IS NOT NULL
+          AND source_type IN ('oracle'::text, 'sqlserver'::text, 'netezza'::text) AND source_server_name IS NOT NULL
           AND source_database_name IS NOT NULL AND source_schema_name IS NOT NULL
           AND source_table_name IS NOT NULL AND source_user_name IS NOT NULL AND source_pass IS NOT NULL
           AND target_schema_name IS NOT NULL AND target_table_name IS NOT NULL
@@ -84,7 +84,7 @@ ALTER TABLE os.ao_job
          );
 
 ALTER TABLE os.ao_job ADD CONSTRAINT job_check_port
-  CHECK ((source_port > 0 AND source_type = 'oracle'::text) OR (source_type <> 'oracle'::text AND source_port IS NULL));
+  CHECK ((source_port > 0 AND source_type = 'oracle'::text) OR (source_port > 0 AND source_type = 'netezza'::text) OR (source_type <> 'oracle'::text AND source_port IS NULL));
 
 ALTER TABLE os.ao_job ADD CONSTRAINT job_refresh_type
   CHECK (refresh_type in ('append', 'refresh', 'replication', 'transform', 'ddl'));

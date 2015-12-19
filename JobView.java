@@ -431,6 +431,10 @@ public class JobView
 		msg += "<tr id=\"r_source_type\"><td><b>Source Type</b></td>\n";
 		msg += "<td><select id=\"source_type\" name=\"source_type\" onchange=\"disableInputFields()\">\n";
 		msg += "<option value=\"\"></option>\n";
+        msg += "<option value=\"netezza\"";
+        if (sourceType != null && sourceType.equals("netezza"))
+            msg += " selected";
+        msg += ">Netezza</option>\n";
 		msg += "<option value=\"oracle\"";
 		if (sourceType != null && sourceType.equals("oracle"))
 			msg += " selected";

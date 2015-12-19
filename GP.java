@@ -741,6 +741,7 @@ public class GP
 			String replSourceTable = getReplTableName(sourceType, sourceTable);
 
 			location = 2308;
+
 			createExternalTable(conn, osServer, refreshType, replSourceTable, replTargetSchema, replTargetTable, maxId, queueId, jobPort);
 
 		}
@@ -834,7 +835,7 @@ public class GP
 		}
 	}	
 
-	private static String getExternalTableName(String targetSchema, String targetTable) throws SQLException
+	public static String getExternalTableName(String targetSchema, String targetTable) throws SQLException
 	{
 		String method = "getExternalTableName";
 		int location = 1000;
