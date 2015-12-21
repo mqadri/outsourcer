@@ -89,15 +89,16 @@ public class Netezza {
             String strSQL = "SELECT  X.ATTNAME AS COLUMN_NAME,\n" +
                     "CASE \tWHEN Y.DATATYPE = 'BPCHAR' THEN 'character'\n" +
                     "\t\tWHEN Y.DATATYPE = 'NCHAR' THEN 'character'\n" +
-                    "\t\tWHEN Y.DATATYPE = 'VARCHAR' THEN 'character'\n" +
+                    "\t\tWHEN Y.DATATYPE = 'VARCHAR' AND X.ATTCOLLENG >= 20 THEN ' text '\n " +
+                    "\t\tWHEN Y.DATATYPE = 'VARCHAR' AND X.ATTCOLLENG < 20 THEN 'character'\n" +
                     "\t\tWHEN Y.DATATYPE = 'NVARCHAR' THEN 'character'\n" +
                     "\t  \tWHEN Y.DATATYPE = 'BOOL' THEN 'bool'\n" +
                     "\t  \tWHEN Y.DATATYPE = 'INT1' THEN 'smallint'\n" +
                     "\t  \tWHEN Y.DATATYPE = 'NUMERIC' THEN X.FORMAT_TYPE\n" +
                     "\t  \tWHEN Y.DATATYPE = 'VARBINARY' THEN 'bytea'\n" +
                     "\t  \tELSE Y.DATATYPE  END ||   -- NO CONVERSION REQ: INT8, INT4, INT2, DATE, FLOAT8, FLOAT4, INTERVAL, NUMERIC\n" +
-                    "CASE WHEN Y.DATATYPE IN ('BPCHAR','NCHAR','VARCHAR','NVARCHAR') THEN '(' || X.ATTCOLLENG || ') ' ELSE ' ' END AS DATATYPE, \n" +
-                    "Y.DATATYPE,\n" +
+                    "CASE WHEN (Y.DATATYPE IN ('BPCHAR','NCHAR','NVARCHAR') or (Y.DATATYPE = 'VARCHAR' AND X.ATTCOLLENG < 20)) THEN '(' || X.ATTCOLLENG+2 || ') ' ELSE ' ' END AS DATATYPE, \n" +
+                    //"Y.DATATYPE,\n" +
                     "X.ATTCOLLENG AS DATA_LENGTH, X.FORMAT_TYPE \n" +
                     " FROM \t\"_V_RELATION_COLUMN\" AS X , _V_datatype as Y\n" +
                     "WHERE X.OWNER = '" + sourceSchema + "' AND X.NAME = '" + sourceTable + "' AND X.ATTTYPID = Y.OBJID AND Y.DATATYPE NOT IN ('ST_GEOMETRY')\n" +
@@ -400,7 +401,7 @@ public class Netezza {
             location = 2100;
             Statement stmt = conn.createStatement();
 
-            String createSQL = "CREATE EXTERNAL TABLE \"" + GP.externalSchema + "\".\"" + externalTable + "\" \n (";
+            String createSQL = "CREATE EXTERNAL WEB TABLE \"" + GP.externalSchema + "\".\"" + externalTable + "\" \n (";
 
             location = 2309;
             String strSQL = "SELECT c.column_name, \n" +
@@ -413,6 +414,8 @@ public class Netezza {
             location = 2400;
             ResultSet rs = stmt.executeQuery(strSQL);
 
+            String nzSQL = "SELECT ";
+
             location = 2500;
             while (rs.next())
             {
@@ -421,14 +424,19 @@ public class Netezza {
                 {
                     location = 2700;
                     createSQL = createSQL + "\"" + rs.getString(1) + "\" " + rs.getString(2);
+                    nzSQL = nzSQL + "\\'~\\' || " + rs.getString(1) + " || \\'~\\'";
                 }
                 else
                 {
                     location = 2800;
                     createSQL = createSQL + ", \n \"" + rs.getString(1) + "\" " + rs.getString(2);
+                    nzSQL = nzSQL + ", \\'~\\' || " + rs.getString(1) + " || \\'~\\'";
                 }
             }
 
+            nzSQL += " FROM ";
+            // Use Select * for now
+            nzSQL = "SELECT * FROM ";
             location = 2900;
             createSQL = createSQL + ") \n";
 
@@ -446,9 +454,9 @@ public class Netezza {
             extLocation = extLocation + "\n" + "FORMAT 'TEXT' (delimiter '|' null 'null' escape '\\\\')";
             */
             // Modified : Execute nzsql to get data from Netezza
-            String extLocation =    "EXECUTE '/usr/local/nz/bin/nzsql -h " + sourceServer + " -port " + sourcePort + " -d " + sourceDatabase + " -u " + sourceUser
-                    + " -W " + sourcePass + " -r -t -A -c \"SELECT * FROM " + sourceSchema + "." + sourceTable + "\" ' ON HOST ";
-            extLocation = extLocation + "\n" + "FORMAT 'TEXT' (delimiter '|' null 'null' escape '\\\\');";
+            String extLocation =    "EXECUTE E'/usr/local/nz/bin/nzsql -h " + sourceServer + " -port " + sourcePort + " -d " + sourceDatabase + " -u " + sourceUser
+                    + " -W " + sourcePass + " -r -t -F \\'|\\' -A -c \"" + nzSQL  + sourceSchema + "." + sourceTable + "\" ' ON MASTER ";
+            extLocation = extLocation + "\n" + "FORMAT 'CSV' (delimiter '|' quote '~' null 'null' escape E'\\\\');";
             location = 3400;
 
             ////////////////////////////////////////////

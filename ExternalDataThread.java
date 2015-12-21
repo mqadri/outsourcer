@@ -131,7 +131,7 @@ public class ExternalDataThread implements Runnable
 
 					location = 4275;
 					//get gpfdist process
-					jobPort = GpfdistRunner.jobStart(osHome);
+					//jobPort = GpfdistRunner.jobStart(osHome);
 					if (debug)
 						Logger.printMsg("QueueID: " + queueId + " getting gpfdist job process " + jobPort);
 
@@ -173,7 +173,7 @@ public class ExternalDataThread implements Runnable
 					if (debug)
 						Logger.printMsg("QueueID: " + queueId + " stop gpfdist process");
 
-					jobStopMsg = GpfdistRunner.jobStop(osHome, jobPort);
+					//jobStopMsg = GpfdistRunner.jobStop(osHome, jobPort);
 					if (debug)
 						Logger.printMsg("QueueID: " + queueId + " gpfdist: " + jobPort + " JobStop msg: " + jobStopMsg);
 
@@ -413,7 +413,9 @@ public class ExternalDataThread implements Runnable
 
 							location = 8575;
 							//get gpfdist process
-							jobPort = GpfdistRunner.jobStart(osHome);
+
+                            //TODO Muji Commented out gpfdist
+                            //jobPort = GpfdistRunner.jobStart(osHome);
 							if (debug)
 								Logger.printMsg("QueueID: " + queueId + " getting gpfdist job process " + jobPort);
 
@@ -444,7 +446,8 @@ public class ExternalDataThread implements Runnable
 							if (debug)
 								Logger.printMsg("QueueID: " + queueId + " stop gpfdist process");
 
-							jobStopMsg = GpfdistRunner.jobStop(osHome, jobPort);
+                            //TODO Muji Commented out gpfdist
+							//jobStopMsg = GpfdistRunner.jobStop(osHome, jobPort);
 							if (debug)
 								Logger.printMsg("QueueID: " + queueId + " gpfdist: " + jobPort + " JobStop msg: " + jobStopMsg);
 
